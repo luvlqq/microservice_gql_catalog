@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
-import { CommonService } from './common.service';
+import { RabbitMqModule } from './modules/rabbitmq/rabbitmq.module';
+import { WinstonModule } from './modules/winston/winston.module';
 
 @Module({
-  providers: [CommonService],
-  exports: [CommonService],
+  imports: [RabbitMqModule, WinstonModule],
+  providers: [],
+  exports: [],
 })
 export class CommonModule {}
