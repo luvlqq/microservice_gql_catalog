@@ -1,0 +1,27 @@
+version: 3,
+services:
+  postgres:
+    mem_limit: 512m
+    image: postgres:15
+    restart: always
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env
+
+  postgres_admin:
+    mem_limit: 512m
+    image: dpage/pgadmin4
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    ports:
+      - '15432:80'
+  # redis:
+  # rabbitmq:
+  # gateway:
+  # auth:
+  # cart:
+  # catalog:
+  # orders:
