@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { CatalogModule } from './catalog.module';
+import { CatalogMicroserviceModule } from './catalogMicroservice.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(CatalogModule);
+  const app = await NestFactory.create(CatalogMicroserviceModule);
   await app.listen(3004);
 }
 bootstrap();

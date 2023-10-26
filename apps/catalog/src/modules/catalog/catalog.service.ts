@@ -1,26 +1,46 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCatalogInput } from './dto/create-catalog.input';
 import { UpdateCatalogInput } from './dto/update-catalog.input';
+import { CatalogRepository } from './catalog.repository';
+import { Catalog } from './entities/catalog.entity';
 
 @Injectable()
 export class CatalogService {
-  create(createCatalogInput: CreateCatalogInput) {
-    return 'This action adds a new catalog';
+  constructor(private readonly repository: CatalogRepository) {}
+
+  public async create(dto: CreateCatalogInput) {
+    try {
+      return this.repository.createAProduct(dto);
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 
-  findAll() {
-    return `This action returns all catalog`;
+  public async findAll(): Promise<Catalog[]> {
+    try {
+      return this.repository.getAllProducts();
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} catalog`;
+  public async findOne(id: number) {
+    try {
+      return this.repository.getProductById(id);
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 
-  update(id: number, updateCatalogInput: UpdateCatalogInput) {
-    return `This action updates a #${id} catalog`;
+  public async update(id: number, dto: UpdateCatalogInput) {
+    return this.repository.updateProduct(id, dto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} catalog`;
+  public async remove(id: number) {
+    try {
+      return this.repository.deleteAProduct(id);
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 }

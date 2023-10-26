@@ -1,7 +1,16 @@
-import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { ObjectType, Field } from '@nestjs/graphql';
 
 @ObjectType()
 export class Catalog {
-  @Field(() => Int, { description: 'Example field (placeholder)' })
-  exampleField: number;
+  @Field()
+  id: number;
+
+  @Field()
+  name: string;
+
+  @Field()
+  description: string;
+
+  @Field()
+  price: number;
 }

@@ -3,6 +3,7 @@ import { CatalogService } from './catalog.service';
 import { Catalog } from './entities/catalog.entity';
 import { CreateCatalogInput } from './dto/create-catalog.input';
 import { UpdateCatalogInput } from './dto/update-catalog.input';
+import { CatalogResponse } from './responses';
 
 @Resolver(() => Catalog)
 export class CatalogResolver {
@@ -11,24 +12,27 @@ export class CatalogResolver {
   @Mutation(() => Catalog)
   createCatalog(
     @Args('createCatalogInput') createCatalogInput: CreateCatalogInput,
-  ) {
+  ): Promise<CatalogResponse> {
     return this.catalogService.create(createCatalogInput);
   }
 
+  //! Не хочет выводиться весь список товаров !
   @Query(() => [Catalog], { name: 'catalog' })
-  findAll() {
+  findAll(): Promise<CatalogResponse[]> {
     return this.catalogService.findAll();
   }
 
   @Query(() => Catalog, { name: 'catalog' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
+  findOne(
+    @Args('id', { type: () => Int }) id: number,
+  ): Promise<CatalogResponse> {
     return this.catalogService.findOne(id);
   }
 
   @Mutation(() => Catalog)
   updateCatalog(
     @Args('updateCatalogInput') updateCatalogInput: UpdateCatalogInput,
-  ) {
+  ): Promise<CatalogResponse> {
     return this.catalogService.update(
       updateCatalogInput.id,
       updateCatalogInput,
