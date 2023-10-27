@@ -1,3 +1,7 @@
 node_modules
 package-lock.json
 dist
+questions.txt
+.hintrc
+/prisma/.env
+.env
