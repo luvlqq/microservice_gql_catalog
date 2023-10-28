@@ -8,6 +8,8 @@ import {
 } from '@nestjs/apollo';
 import { CatalogRepository } from './catalog.repository';
 import { PrismaModule } from '@app/db';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
 
 @Module({
   imports: [
@@ -17,6 +19,12 @@ import { PrismaModule } from '@app/db';
       autoSchemaFile: {
         federation: 2,
       },
+    }),
+    CacheModule.register({
+      isGlobal: true,
+      store: redisStore,
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
     }),
   ],
   providers: [CatalogResolver, CatalogService, CatalogRepository],

@@ -4,6 +4,8 @@ import { Catalog } from './entities/catalog.entity';
 import { CreateCatalogInput } from './dto/create-catalog.input';
 import { UpdateCatalogInput } from './dto/update-catalog.input';
 import { CatalogResponse } from './responses';
+import { UseInterceptors } from '@nestjs/common';
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 
 @Resolver(() => Catalog)
 export class CatalogResolver {
@@ -12,20 +14,22 @@ export class CatalogResolver {
   @Mutation(() => Catalog)
   createCatalog(
     @Args('createCatalogInput') createCatalogInput: CreateCatalogInput,
-  ): Promise<CatalogResponse> {
+  ): Promise<CatalogResponse | any> {
     return this.catalogService.create(createCatalogInput);
   }
 
-  //! Не хочет выводиться весь список товаров !
-  @Query(() => [Catalog], { name: 'catalog' })
+  @Query(() => [Catalog], { name: 'catalogs' })
   findAll(): Promise<CatalogResponse[]> {
     return this.catalogService.findAll();
   }
 
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('findByIdCatalog')
+  @CacheTTL(30)
   @Query(() => Catalog, { name: 'catalog' })
   findOne(
     @Args('id', { type: () => Int }) id: number,
-  ): Promise<CatalogResponse> {
+  ): Promise<CatalogResponse | unknown> {
     return this.catalogService.findOne(id);
   }
 
