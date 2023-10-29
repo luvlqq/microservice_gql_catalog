@@ -32,7 +32,6 @@ export class CatalogService {
   public async findOne(id: number) {
     try {
       const cachedData = await this.cacheService.get(id.toString());
-      console.log(cachedData);
       if (cachedData) {
         return cachedData;
       }
