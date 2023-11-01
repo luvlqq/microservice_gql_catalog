@@ -1,35 +1,36 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Context } from '@nestjs/graphql';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { Auth } from './entities/auth.entity';
-import { CreateAuthInput } from './dto/create-auth.input';
-import { UpdateAuthInput } from './dto/update-auth.input';
+import { CreateAuthInput } from './dto/auth.dto';
+import { Public } from '@app/common/modules/auth/decorators';
+import { Res } from '@nestjs/common';
 
 @Resolver(() => Auth)
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Mutation(() => Auth)
-  createAuth(@Args('createAuthInput') createAuthInput: CreateAuthInput) {
-    return this.authService.create(createAuthInput);
+  public async register(
+    @Args('CreateAuthInput') CreateAuthInput: CreateAuthInput,
+    @Context() context: any,
+  ) {
+    const tokens = await this.authService.register(CreateAuthInput);
+    context.res.cookie('accessToken', tokens.accessToken, { httpOnly: true });
+    context.res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true });
+    return tokens;
   }
 
-  @Query(() => [Auth], { name: 'auth' })
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Query(() => Auth, { name: 'auth' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.authService.findOne(id);
-  }
-
+  @Public()
   @Mutation(() => Auth)
-  updateAuth(@Args('updateAuthInput') updateAuthInput: UpdateAuthInput) {
-    return this.authService.update(updateAuthInput.id, updateAuthInput);
-  }
-
-  @Mutation(() => Auth)
-  removeAuth(@Args('id', { type: () => Int }) id: number) {
-    return this.authService.remove(id);
+  public async login(
+    @Args('CreateAuthInput') CreateAuthInput: CreateAuthInput,
+    @Context() context: any,
+  ) {
+    const tokens = await this.authService.login(CreateAuthInput);
+    context.res.cookie('accessToken', tokens.accessToken, { httpOnly: true });
+    context.res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true });
+    return tokens;
   }
 }

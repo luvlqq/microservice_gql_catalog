@@ -5,3 +5,4 @@ questions.txt
 .hintrc
 /prisma/.env
 .env
+.idea
