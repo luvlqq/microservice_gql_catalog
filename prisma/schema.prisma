@@ -11,15 +11,52 @@ datasource db {
 }
 
 model User {
-  id       Int     @unique @default(autoincrement())
-  email    String  @unique
-  password String
-  hashRt   String?
+  id            Int       @unique @default(autoincrement())
+  email         String    @unique
+  password      String
+  hashRt        String?
+  role          Roles     @default(User)
+  addedProducts Product[]
+  userCart      Cart[]
+  orders        Order[]
 }
 
 model Product {
-  id          Int    @unique @default(autoincrement())
-  name        String
-  description String
-  price       Int
+  id           Int         @unique @default(autoincrement())
+  name         String
+  description  String
+  price        Int
+  productOwner User        @relation(fields: [userId], references: [id])
+  userId       Int
+  CartItem     CartItem[]
+  Order        Order?      @relation(fields: [orderId], references: [id])
+  orderId      Int?
+}
+
+model Cart {
+  id        Int        @unique @default(autoincrement())
+  cartItems CartItem[]
+  userId    Int
+  User      User       @relation(fields: [userId], references: [id])
+}
+
+model CartItem {
+  id        Int     @unique @default(autoincrement())
+  quantity  Int
+  productId Int
+  Product   Product @relation(fields: [productId], references: [id])
+  cartId    Int
+  Cart      Cart    @relation(fields: [cartId], references: [id])
+}
+
+model Order {
+  id       Int       @unique @default(autoincrement())
+  products Product[]
+  userId   Int
+  User     User      @relation(fields: [userId], references: [id])
+}
+
+enum Roles {
+  Admin
+  User
 }
