@@ -15,8 +15,10 @@ export class CatalogRepository {
     return await this.prisma.product.findUnique({ where: { id: id } });
   }
 
-  public async createAProduct(dto: CreateCatalogInput) {
-    return await this.prisma.product.create({ data: { ...dto } });
+  public async createAProduct(userId: number, dto: CreateCatalogInput) {
+    return await this.prisma.product.create({
+      data: { ...dto, userId: userId },
+    });
   }
 
   public async updateProduct(id: number, dto: UpdateCatalogInput) {

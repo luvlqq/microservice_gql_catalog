@@ -19,6 +19,11 @@ services:
     ports:
       - '15432:80'
 
+  mongo:
+    image: mongo
+    ports:
+      - 27017:27017
+
   redis:
     container_name: cache
     image: redis

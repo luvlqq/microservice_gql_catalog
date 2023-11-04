@@ -16,6 +16,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { UpdateCatalogHandler } from './handlers/commands/update';
 import { RemoveCatalogHandler } from './handlers/commands/delete';
 import { GetCatalogByIdHandler } from './handlers/queries/findOne';
+import { MongodbModule } from '../mongodb/mongodb.module';
 
 const CommandHandlers = [
   CreateCatalogHandler,
@@ -28,6 +29,7 @@ const QueryHandlers = [GetAllCatalogsHandler, GetCatalogByIdHandler];
   imports: [
     PrismaModule,
     CqrsModule,
+    MongodbModule,
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       autoSchemaFile: {

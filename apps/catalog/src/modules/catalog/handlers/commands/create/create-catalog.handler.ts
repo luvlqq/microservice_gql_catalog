@@ -9,6 +9,9 @@ export class CreateCatalogHandler
   constructor(private readonly catalogService: CatalogService) {}
 
   public async execute(command: CreateCatalogCommand) {
-    return this.catalogService.create(command.createCatalogInput);
+    return this.catalogService.create(
+      command.userId,
+      command.createCatalogInput,
+    );
   }
 }

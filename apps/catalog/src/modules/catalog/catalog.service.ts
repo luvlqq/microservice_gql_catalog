@@ -13,9 +13,9 @@ export class CatalogService {
     @Inject(CACHE_MANAGER) private cacheService: Cache,
   ) {}
 
-  public async create(dto: CreateCatalogInput) {
+  public async create(userId: number, dto: CreateCatalogInput) {
     try {
-      return this.repository.createAProduct(dto);
+      return this.repository.createAProduct(userId, dto);
     } catch (e) {
       throw new Error(e);
     }

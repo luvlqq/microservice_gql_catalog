@@ -1,14 +1,14 @@
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 import { GetAllCatalogsQuery } from './get-all-catalogs.query';
-import { CatalogService } from '../../../catalog.service';
+import { MongodbService } from 'apps/catalog/src/modules/mongodb/mongodb.service';
 
 @QueryHandler(GetAllCatalogsQuery)
 export class GetAllCatalogsHandler
   implements IQueryHandler<GetAllCatalogsQuery>
 {
-  constructor(private readonly catalogService: CatalogService) {}
+  constructor(private readonly mongodbService: MongodbService) {}
 
   public async execute() {
-    return this.catalogService.findAll();
+    return this.mongodbService.findAll();
   }
 }

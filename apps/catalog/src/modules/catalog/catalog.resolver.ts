@@ -1,5 +1,4 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { CatalogService } from './catalog.service';
 import { Catalog } from './entities/catalog.entity';
 import { CreateCatalogInput } from './dto/create-catalog.input';
 import { UpdateCatalogInput } from './dto/update-catalog.input';
@@ -12,11 +11,11 @@ import { GetAllCatalogsQuery } from './handlers/queries/findAll';
 import { GetCatalogByIdQuery } from './handlers/queries/findOne';
 import { UpdateCatalogCommand } from './handlers/commands/update';
 import { RemoveCatalogCommand } from './handlers/commands/delete';
+import { GetCurrentUserId } from '@app/common/modules/auth/decorators';
 
 @Resolver(() => Catalog)
 export class CatalogResolver {
   constructor(
-    private readonly catalogService: CatalogService,
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
@@ -24,9 +23,10 @@ export class CatalogResolver {
   @Mutation(() => Catalog)
   createCatalog(
     @Args('createCatalogInput') createCatalogInput: CreateCatalogInput,
+    @GetCurrentUserId() userId: number,
   ): Promise<CatalogResponse | any> {
     return this.commandBus.execute(
-      new CreateCatalogCommand(createCatalogInput),
+      new CreateCatalogCommand(createCatalogInput, userId),
     );
   }
 
