@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { CartModule } from './../src/cart.module';
+import { CartModule } from '../src/modules/cart/cart.module';
 
 describe('CartController (e2e)', () => {
   let app: INestApplication;
