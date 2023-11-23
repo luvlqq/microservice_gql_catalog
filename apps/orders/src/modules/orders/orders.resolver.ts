@@ -1,35 +1,29 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Mutation, Args } from '@nestjs/graphql';
 import { OrdersService } from './orders.service';
-import { Order } from './entities/order.entity';
 import { CreateOrderInput } from './dto/create-order.input';
-import { UpdateOrderInput } from './dto/update-order.input';
+import { OrderWithPaymentUrl } from './entities/orderWithPayment.entity';
+import { GetCurrentUserId } from '@app/common/modules/auth/decorators';
 
-@Resolver(() => Order)
+@Resolver(() => OrderWithPaymentUrl)
 export class OrdersResolver {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @Mutation(() => Order)
-  createOrder(@Args('createOrderInput') createOrderInput: CreateOrderInput) {
-    return this.ordersService.create(createOrderInput);
-  }
-
-  @Query(() => [Order], { name: 'orders' })
-  findAll() {
-    return this.ordersService.findAll();
-  }
-
-  @Query(() => Order, { name: 'order' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.ordersService.findOne(id);
-  }
-
-  @Mutation(() => Order)
-  updateOrder(@Args('updateOrderInput') updateOrderInput: UpdateOrderInput) {
-    return this.ordersService.update(updateOrderInput.id, updateOrderInput);
-  }
-
-  @Mutation(() => Order)
-  removeOrder(@Args('id', { type: () => Int }) id: number) {
-    return this.ordersService.remove(id);
+  @Mutation(() => OrderWithPaymentUrl)
+  async createOrder(
+    @GetCurrentUserId() userId: number,
+    @Args('createOrderInput') createOrderInput: CreateOrderInput,
+  ) {
+    const order = await this.ordersService.createOrder(
+      userId,
+      createOrderInput,
+    );
+    const paymentUrl = await this.ordersService.redirectToCheckout(
+      order.orderId,
+    );
+    return {
+      orderId: order.orderId,
+      paymentIntentId: order.paymentIntendId,
+      paymentUrl,
+    };
   }
 }

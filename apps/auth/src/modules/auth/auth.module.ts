@@ -11,20 +11,35 @@ import {
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
 import { ConfigModule } from '@nestjs/config';
+import { AtStrategy, RtStrategy } from '@app/common/modules/auth/strategies';
+import configuration from '@app/common/modules/auth/config/configuration';
+import { MyLoggerModule } from '@app/common/modules/winston/winston.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     JwtModule.register({}),
     PrismaModule,
+    MyLoggerModule,
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       autoSchemaFile: {
         federation: 2,
       },
       context: ({ req, res }) => ({ req, res }),
+      cors: {
+        origin: '*',
+        credentials: true,
+      },
     }),
   ],
-  providers: [AuthResolver, AuthService, AuthRepository, JwtTokenService],
+  providers: [
+    AuthResolver,
+    AuthService,
+    AuthRepository,
+    JwtTokenService,
+    AtStrategy,
+    RtStrategy,
+  ],
 })
 export class AuthModule {}

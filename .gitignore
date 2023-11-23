@@ -6,3 +6,5 @@ questions.txt
 /prisma/.env
 .env
 .idea
+.vscode
+catalog2.resolver.ts

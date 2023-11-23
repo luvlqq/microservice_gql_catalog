@@ -1,26 +1,77 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateOrderInput } from './dto/create-order.input';
-import { UpdateOrderInput } from './dto/update-order.input';
+import { ClientProxy } from '@nestjs/microservices';
+import { PrismaService } from '@app/db';
+import { OrdersRepository } from './orders.repository';
+import Stripe from 'stripe';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OrdersService {
-  create(createOrderInput: CreateOrderInput) {
-    return 'This action adds a new order';
+  private stripe: Stripe;
+  constructor(
+    @Inject('ORDER') private meetupClient: ClientProxy,
+    private readonly prisma: PrismaService,
+    private readonly repository: OrdersRepository,
+    private readonly configService: ConfigService,
+  ) {
+    const key = this.configService.get('SECRET_KEY');
+    this.stripe = new Stripe(key, {
+      apiVersion: '2023-10-16',
+    });
   }
 
-  findAll() {
-    return `This action returns all orders`;
+  public async createOrder(userId: number, createOrderInput: CreateOrderInput) {
+    const product = await this.prisma.product.findUnique({
+      where: { id: createOrderInput.productId },
+    });
+
+    if (!product) throw new Error('Product not found');
+
+    const paymentIntend = await this.stripe.paymentIntents.create({
+      amount: product.price,
+      currency: 'usd',
+    });
+
+    const order = await this.addProductFromOrderToCart(
+      userId,
+      createOrderInput.productId,
+    );
+
+    return {
+      orderId: order.id,
+      paymentIntendId: paymentIntend.id,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  public async redirectToCheckout(orderId: number) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: { products: true },
+    });
+
+    if (!order) throw new Error('Order not found!');
+
+    const session = await this.stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: order.products.map((product) => ({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: product.name,
+          },
+          unit_amount: product.price,
+        },
+        quantity: 1,
+      })),
+      mode: 'payment',
+      success_url: 'http://localhost:3001/sucess',
+      cancel_url: 'http://localhost:3001/cancel',
+    });
+    return session.url;
   }
 
-  update(id: number, updateOrderInput: UpdateOrderInput) {
-    return `This action updates a #${id} order`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  public async addProductFromOrderToCart(userId: number, productId: number) {
+    return this.repository.createOrder(userId, productId);
   }
 }

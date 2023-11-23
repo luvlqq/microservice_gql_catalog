@@ -1,8 +1,9 @@
-import { ObjectType, Field } from '@nestjs/graphql';
+import { ObjectType, Field, Int, Directive } from '@nestjs/graphql';
 
 @ObjectType()
+@Directive('@key(fields: "id name description price")')
 export class Catalog {
-  @Field()
+  @Field(() => Int)
   id: number;
 
   @Field()

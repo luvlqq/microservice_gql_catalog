@@ -1,26 +1,22 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCartInput } from './dto/create-cart.input';
-import { UpdateCartInput } from './dto/update-cart.input';
+import { Inject, Injectable } from '@nestjs/common';
+import { CartRepository } from './cart.repository';
+import { ClientProxy } from '@nestjs/microservices';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class CartService {
-  create(createCartInput: CreateCartInput) {
-    return 'This action adds a new cart';
+  constructor(
+    private readonly repository: CartRepository,
+    @Inject('ORDER') private readonly cartClient: ClientProxy,
+  ) {}
+  public async createCart(userId: number, productId: number) {
+    await lastValueFrom(
+      this.cartClient.send('addToOrder', { userId, productId }),
+    );
+    return this.repository.addProductToCart(userId, productId);
   }
 
-  findAll() {
-    return `This action returns all cart`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} cart`;
-  }
-
-  update(id: number, updateCartInput: UpdateCartInput) {
-    return `This action updates a #${id} cart`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} cart`;
+  public async findAll(userId: number) {
+    return this.repository.getCart(userId);
   }
 }

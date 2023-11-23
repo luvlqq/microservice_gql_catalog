@@ -17,7 +17,7 @@ export class CatalogRepository {
 
   public async createAProduct(userId: number, dto: CreateCatalogInput) {
     return await this.prisma.product.create({
-      data: { ...dto, userId: userId },
+      data: { ...dto, ownerId: userId },
     });
   }
 

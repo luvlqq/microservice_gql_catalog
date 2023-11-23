@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,49 +8,42 @@ datasource db {
 }
 
 model User {
-  id            Int       @unique @default(autoincrement())
-  email         String    @unique
-  password      String
-  hashRt        String?
-  role          Roles     @default(User)
-  addedProducts Product[]
-  userCart      Cart[]
-  orders        Order[]
-}
-
-model Product {
-  id           Int         @unique @default(autoincrement())
-  name         String
-  description  String
-  price        Int
-  productOwner User        @relation(fields: [userId], references: [id])
-  userId       Int
-  CartItem     CartItem[]
-  Order        Order?      @relation(fields: [orderId], references: [id])
-  orderId      Int?
+  id       Int       @id @default(autoincrement())
+  email    String    @unique
+  password String
+  hashRt   String?
+  role     Roles     @default(User)
+  cart     Cart?
+  orders   Order[]
+  Product  Product[]
 }
 
 model Cart {
-  id        Int        @unique @default(autoincrement())
-  cartItems CartItem[]
-  userId    Int
-  User      User       @relation(fields: [userId], references: [id])
-}
-
-model CartItem {
-  id        Int     @unique @default(autoincrement())
-  quantity  Int
-  productId Int
-  Product   Product @relation(fields: [productId], references: [id])
-  cartId    Int
-  Cart      Cart    @relation(fields: [cartId], references: [id])
+  id       Int       @id @default(autoincrement())
+  user     User      @relation(fields: [userId], references: [id])
+  userId   Int       @unique
+  products Product[]
 }
 
 model Order {
-  id       Int       @unique @default(autoincrement())
-  products Product[]
-  userId   Int
-  User     User      @relation(fields: [userId], references: [id])
+  id        Int       @id @default(autoincrement())
+  orderDate DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int
+  products  Product[]
+}
+
+model Product {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+  price       Int
+  owner       User   @relation(fields: [ownerId], references: [id])
+  ownerId     Int
+  orders      Order? @relation(fields: [orderId], references: [id])
+  orderId     Int?
+  Cart        Cart?  @relation(fields: [cartId], references: [id])
+  cartId      Int?
 }
 
 enum Roles {

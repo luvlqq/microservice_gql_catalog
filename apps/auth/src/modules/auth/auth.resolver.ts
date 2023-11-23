@@ -1,10 +1,8 @@
 import { Resolver, Mutation, Args, Context } from '@nestjs/graphql';
-import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { Auth } from './entities/auth.entity';
 import { CreateAuthInput } from './dto/auth.dto';
 import { Public } from '@app/common/modules/auth/decorators';
-import { Res } from '@nestjs/common';
 
 @Resolver(() => Auth)
 export class AuthResolver {

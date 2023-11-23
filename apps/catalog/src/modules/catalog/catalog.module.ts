@@ -17,6 +17,11 @@ import { UpdateCatalogHandler } from './handlers/commands/update';
 import { RemoveCatalogHandler } from './handlers/commands/delete';
 import { GetCatalogByIdHandler } from './handlers/queries/findOne';
 import { MongodbModule } from '../mongodb/mongodb.module';
+import { AtGuard } from '@app/common/modules/auth/guards';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
+import { MyLoggerModule } from '@app/common/modules/winston/winston.module';
+import { RoleGuard } from '@app/common/modules/auth/guards/roles.guard';
 
 const CommandHandlers = [
   CreateCatalogHandler,
@@ -27,14 +32,21 @@ const QueryHandlers = [GetAllCatalogsHandler, GetCatalogByIdHandler];
 
 @Module({
   imports: [
+    JwtModule.register({}),
     PrismaModule,
     CqrsModule,
     MongodbModule,
+    MyLoggerModule,
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       autoSchemaFile: {
         federation: 2,
       },
+      cors: {
+        credentials: true,
+        origin: '*',
+      },
+      context: ({ req, res }) => ({ req, res }),
     }),
     CacheModule.register({
       isGlobal: true,
@@ -47,6 +59,12 @@ const QueryHandlers = [GetAllCatalogsHandler, GetCatalogByIdHandler];
     CatalogResolver,
     CatalogService,
     CatalogRepository,
+    RoleGuard,
+    AtGuard,
+    {
+      provide: APP_GUARD,
+      useClass: AtGuard,
+    },
     ...CommandHandlers,
     ...QueryHandlers,
   ],

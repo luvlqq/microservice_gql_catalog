@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CartResolver } from './cart.resolver';
-import { CartService } from './cart.service';
+import { CartResolver } from '../cart.resolver';
+import { CartService } from '../cart.service';
 
 describe('CartResolver', () => {
   let resolver: CartResolver;

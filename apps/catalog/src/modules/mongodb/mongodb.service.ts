@@ -10,10 +10,10 @@ export class MongodbService {
   ) {}
 
   public async findAll(): Promise<Product[]> {
-    return this.productModel.find().exec();
+    return await this.productModel.find();
   }
 
-  public async findOne(id: number): Promise<Product> {
-    return this.productModel.findById(id);
+  public async findOne(_id: number): Promise<Product> {
+    return this.productModel.findById(_id);
   }
 }
